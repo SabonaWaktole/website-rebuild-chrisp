@@ -77,28 +77,44 @@
     const directoryRoot = qs('main input[placeholder^="Search leaders"]')?.closest("main");
     if (!directoryRoot) return;
     const searchInput = qs('input[placeholder^="Search leaders"]', directoryRoot);
-    const cards = qsa('a[data-slug][href^="/profiles/"]', directoryRoot);
+    const cards = qsa("a[data-slug]", directoryRoot).filter((card) => {
+      const href = card.getAttribute("href") || "";
+      return href.includes("/profiles/");
+    });
     const countEl = qsa("p", directoryRoot).find((p) => /Showing/i.test(p.textContent || "") && /curated members/i.test(p.textContent || ""));
-    const genderButtons = qsa("button", directoryRoot).filter((b) => (b.textContent || "").trim() === "Male" || (b.textContent || "").trim() === "Female");
-    const sectorButtons = qsa("button", directoryRoot).filter((b) => {
-      const t = (b.textContent || "").trim();
-      return t && t !== "Male" && t !== "Female" && t !== "Send Message";
-    }
-    );
-    let selectedGender = null;
-    // "Male" | "Female" | null
+    const genderSectionTitle = qsa("h3", directoryRoot).find((h) => /Filter by Gender/i.test(h.textContent || ""));
+    const sectorSectionTitle = qsa("h3", directoryRoot).find((h) => /Filter by Sector/i.test(h.textContent || ""));
+    const genderButtons = genderSectionTitle ? qsa("button", genderSectionTitle.parentElement || directoryRoot) : [];
+    const sectorButtons = sectorSectionTitle ? qsa("button", sectorSectionTitle.parentElement || directoryRoot) : [];
+    const clearFiltersBtn = qs(".ic-clear-filters", directoryRoot);
+    if (!cards.length || !genderButtons.length || !sectorButtons.length) return;
+    const selectedGenders = new Set();
     const selectedSectors = new Set();
     let query = "";
     const activeBtnClasses = ["ic-active"];
+    const genderActiveClass = "ic-active-gender";
+    const sectorActiveClass = "ic-active-sector";
+    genderButtons.forEach((btn) => btn.classList.add("ic-gender-btn"));
+    sectorButtons.forEach((btn) => btn.classList.add("ic-sector-btn"));
     function setBtnActive(btn, active) {
+      const typeClass = btn.classList.contains("ic-gender-btn") ? genderActiveClass : sectorActiveClass;
       activeBtnClasses.forEach((c) => btn.classList.toggle(c, active));
+      btn.classList.toggle(typeClass, active);
     }
     function normalize(s) {
       return (s || "").toLowerCase().trim();
     }
+    function hasActiveFilters() {
+      return selectedGenders.size > 0 || selectedSectors.size > 0 || normalize(query).length > 0;
+    }
+    function syncClearButtonVisibility() {
+      if (!clearFiltersBtn) return;
+      const show = hasActiveFilters();
+      clearFiltersBtn.classList.toggle("hidden", !show);
+    }
     function matches(card) {
       const gender = card.getAttribute("data-gender") || "";
-      const industries = (card.getAttribute("data-industries") || "").split("|").filter(Boolean);
+      const industries = (card.getAttribute("data-industries") || "").split("|").map((s) => s.trim()).filter(Boolean);
       const tags = (card.getAttribute("data-tags") || "").split("|").filter(Boolean);
       const text = normalize(
       [
@@ -108,9 +124,9 @@
       tags.join(" "),
       ].join(" ")
       );
-      if (selectedGender && gender !== selectedGender) return false;
+      if (selectedGenders.size && !selectedGenders.has(normalize(gender))) return false;
       if (selectedSectors.size) {
-        const has = industries.some((i) => selectedSectors.has(i));
+        const has = industries.some((i) => selectedSectors.has(normalize(i)));
         if (!has) return false;
       }
       if (query && !text.includes(normalize(query))) return false;
@@ -128,13 +144,16 @@
         shown
       }
       <!-- --> curated members`;
+      syncClearButtonVisibility();
     }
     genderButtons.forEach((btn) => {
       const label = (btn.textContent || "").trim();
       btn.addEventListener("click", (e) => {
         e.preventDefault();
-        selectedGender = selectedGender === label ? null : label;
-        genderButtons.forEach((b) => setBtnActive(b, (b.textContent || "").trim() === selectedGender));
+        const normalizedLabel = normalize(label);
+        if (selectedGenders.has(normalizedLabel)) selectedGenders.delete(normalizedLabel);
+        else selectedGenders.add(normalizedLabel);
+        setBtnActive(btn, selectedGenders.has(normalizedLabel));
         update();
       }
       );
@@ -144,9 +163,10 @@
       const label = (btn.textContent || "").trim();
       btn.addEventListener("click", (e) => {
         e.preventDefault();
-        if (selectedSectors.has(label)) selectedSectors.delete(label);
-        else selectedSectors.add(label);
-        setBtnActive(btn, selectedSectors.has(label));
+        const normalizedLabel = normalize(label);
+        if (selectedSectors.has(normalizedLabel)) selectedSectors.delete(normalizedLabel);
+        else selectedSectors.add(normalizedLabel);
+        setBtnActive(btn, selectedSectors.has(normalizedLabel));
         update();
       }
       );
@@ -155,6 +175,18 @@
     if (searchInput) {
       searchInput.addEventListener("input", () => {
         query = searchInput.value || "";
+        update();
+      }
+      );
+    }
+    if (clearFiltersBtn) {
+      clearFiltersBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        selectedGenders.clear();
+        selectedSectors.clear();
+        query = "";
+        if (searchInput) searchInput.value = "";
+        [...genderButtons, ...sectorButtons].forEach((btn) => setBtnActive(btn, false));
         update();
       }
       );
