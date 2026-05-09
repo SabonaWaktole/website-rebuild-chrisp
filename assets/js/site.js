@@ -193,7 +193,63 @@
     }
     update();
   }
+  function dirnamePathParts(pathname) {
+    const parts = pathname.split("/").filter(Boolean);
+    if (parts.length) {
+      const last = parts[parts.length - 1];
+      if (last.includes(".")) parts.pop();
+    }
+    return parts;
+  }
+  function shouldAppendIndexPath(pathname) {
+    const trimmed = pathname.replace(/\/$/, "") || "/";
+    if (trimmed === "/" || trimmed === "") return true;
+    const segments = trimmed.split("/").filter(Boolean);
+    const last = segments[segments.length - 1];
+    if (last === "index") return false;
+    if (last.endsWith(".html")) return false;
+    if (last.includes(".") && !last.endsWith(".html")) return false;
+    const prefix = `/${segments.join("/")}`;
+    if (prefix.includes("/assets/") || prefix.includes("/images/")) return false;
+    return true;
+  }
+  function pathWithIndexSuffix(pathname) {
+    const base = pathname.replace(/\/$/, "") || "/";
+    if (base === "/" || base === "") return "/index";
+    return `${base}/index`;
+  }
+  function relativePathBetween(fromPathname, toPathname) {
+    const fromParts = dirnamePathParts(fromPathname);
+    const toParts = toPathname.split("/").filter(Boolean);
+    let i = 0;
+    while (i < fromParts.length && i < toParts.length && fromParts[i] === toParts[i]) i++;
+    const ups = fromParts.length - i;
+    const out = [...Array(ups).fill(".."), ...toParts.slice(i)];
+    if (!out.length) return ".";
+    return out.join("/");
+  }
+  function initInternalLinkIndexSuffix() {
+    const here = new URL(window.location.href);
+    qsa("a[href]").forEach((a) => {
+      const raw = a.getAttribute("href");
+      if (!raw || raw.startsWith("javascript:")) return;
+      if (raw.startsWith("mailto:") || raw.startsWith("tel:")) return;
+      let resolved;
+      try {
+        resolved = new URL(raw, document.baseURI);
+      } catch {
+        return;
+      }
+      if (resolved.origin !== here.origin) return;
+      if (!shouldAppendIndexPath(resolved.pathname)) return;
+      const nextPath = pathWithIndexSuffix(resolved.pathname);
+      const target = new URL(nextPath + resolved.search + resolved.hash, resolved.origin);
+      const rel = relativePathBetween(here.pathname, target.pathname) + target.search + target.hash;
+      a.setAttribute("href", rel);
+    });
+  }
   function init() {
+    initInternalLinkIndexSuffix();
     initDesktopDropdowns();
     initMobileMenu();
     initDirectoryFilters();
