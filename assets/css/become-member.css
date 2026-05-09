@@ -1,5 +1,4 @@
 /* Scoped to /become-member — matches live styled-jsx input underline treatment */
-
 [data-page="become-member"] .input-field {
   box-sizing: border-box;
   display: block;
@@ -16,22 +15,18 @@
   line-height: 1.25rem;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
-
 [data-page="become-member"] .input-field::placeholder {
   color: #71717a;
 }
-
 [data-page="become-member"] .input-field:hover {
   border-bottom-color: rgba(255, 255, 255, 0.28);
 }
-
 [data-page="become-member"] .input-field:focus,
 [data-page="become-member"] .input-field:focus-visible {
   outline: none;
   border-bottom-color: #d4af37;
   box-shadow: 0 1px 0 0 #d4af37;
 }
-
 /* Chrome autofill: avoid white slab over underline */
 [data-page="become-member"] .input-field:-webkit-autofill,
 [data-page="become-member"] .input-field:-webkit-autofill:hover,
@@ -41,7 +36,6 @@
   transition: background-color 99999s ease-out 0s;
   box-shadow: 0 0 0 1000px rgba(10, 10, 10, 0.95) inset, 0 1px 0 0 rgba(255, 255, 255, 0.18);
 }
-
 [data-page="become-member"] .input-field:-webkit-autofill:focus {
   box-shadow: 0 0 0 1000px rgba(10, 10, 10, 0.95) inset, 0 1px 0 0 #d4af37;
 }
