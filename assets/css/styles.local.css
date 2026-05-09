@@ -1031,7 +1031,7 @@ h1,h2,h3,h4,h5,h6{
   background-color:#18181b80
 }
 .bg-\[url\(\'\/gold-texture\.jpg\'\)\]{
-  background-image:url(/gold-texture.jpg)
+  background-image:url(../../gold-texture.jpg)
 }
 .bg-gradient-to-b{
   background-image:linear-gradient(to bottom,var(--tw-gradient-stops))
