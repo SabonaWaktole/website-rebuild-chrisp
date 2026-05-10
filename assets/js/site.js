@@ -104,6 +104,27 @@
     function normalize(s) {
       return (s || "").toLowerCase().trim();
     }
+    function cardNormalizedSectors(card) {
+      const norms = new Set();
+      (card.getAttribute("data-industries") || "").split("|").map((s) => s.trim()).filter(Boolean).forEach((i) => {
+        norms.add(normalize(i));
+      }
+      );
+      const sub =
+      qs('p[class*="text-luxury-gold/80"]', card) || (() => {
+        const h3 = qs("h3", card);
+        const n = h3?.nextElementSibling;
+        return n && n.tagName === "P" ? n : null;
+      }
+      )();
+      if (sub) {
+        (sub.textContent || "").split("/").map((s) => s.trim()).filter(Boolean).forEach((p) => {
+          norms.add(normalize(p));
+        }
+        );
+      }
+      return norms;
+    }
     function hasActiveFilters() {
       return selectedGenders.size > 0 || selectedSectors.size > 0 || normalize(query).length > 0;
     }
@@ -115,18 +136,19 @@
     function matches(card) {
       const gender = card.getAttribute("data-gender") || "";
       const industries = (card.getAttribute("data-industries") || "").split("|").map((s) => s.trim()).filter(Boolean);
+      const sectorNorms = cardNormalizedSectors(card);
       const tags = (card.getAttribute("data-tags") || "").split("|").filter(Boolean);
       const text = normalize(
       [
       card.textContent,
       gender,
-      industries.join(" "),
+      [...sectorNorms].join(" "),
       tags.join(" "),
       ].join(" ")
       );
       if (selectedGenders.size && !selectedGenders.has(normalize(gender))) return false;
       if (selectedSectors.size) {
-        const has = industries.some((i) => selectedSectors.has(normalize(i)));
+        const has = [...selectedSectors].some((sel) => sectorNorms.has(sel));
         if (!has) return false;
       }
       if (query && !text.includes(normalize(query))) return false;
@@ -198,6 +220,10 @@
     if (parts.length) {
       const last = parts[parts.length - 1];
       if (last.includes(".")) parts.pop();
+    }
+    if (parts.length) {
+      const last = parts[parts.length - 1];
+      if (last.toLowerCase() === "index") parts.pop();
     }
     return parts;
   }
