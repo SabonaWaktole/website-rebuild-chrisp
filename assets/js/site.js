@@ -104,6 +104,27 @@
     function normalize(s) {
       return (s || "").toLowerCase().trim();
     }
+    function cardNormalizedSectors(card) {
+      const norms = new Set();
+      (card.getAttribute("data-industries") || "").split("|").map((s) => s.trim()).filter(Boolean).forEach((i) => {
+        norms.add(normalize(i));
+      }
+      );
+      const sub =
+      qs('p[class*="text-luxury-gold/80"]', card) || (() => {
+        const h3 = qs("h3", card);
+        const n = h3?.nextElementSibling;
+        return n && n.tagName === "P" ? n : null;
+      }
+      )();
+      if (sub) {
+        (sub.textContent || "").split("/").map((s) => s.trim()).filter(Boolean).forEach((p) => {
+          norms.add(normalize(p));
+        }
+        );
+      }
+      return norms;
+    }
     function hasActiveFilters() {
       return selectedGenders.size > 0 || selectedSectors.size > 0 || normalize(query).length > 0;
     }
@@ -115,18 +136,19 @@
     function matches(card) {
       const gender = card.getAttribute("data-gender") || "";
       const industries = (card.getAttribute("data-industries") || "").split("|").map((s) => s.trim()).filter(Boolean);
+      const sectorNorms = cardNormalizedSectors(card);
       const tags = (card.getAttribute("data-tags") || "").split("|").filter(Boolean);
       const text = normalize(
       [
       card.textContent,
       gender,
-      industries.join(" "),
+      [...sectorNorms].join(" "),
       tags.join(" "),
       ].join(" ")
       );
       if (selectedGenders.size && !selectedGenders.has(normalize(gender))) return false;
       if (selectedSectors.size) {
-        const has = industries.some((i) => selectedSectors.has(normalize(i)));
+        const has = [...selectedSectors].some((sel) => sectorNorms.has(sel));
         if (!has) return false;
       }
       if (query && !text.includes(normalize(query))) return false;
@@ -199,6 +221,10 @@
       const last = parts[parts.length - 1];
       if (last.includes(".")) parts.pop();
     }
+    if (parts.length) {
+      const last = parts[parts.length - 1];
+      if (last.toLowerCase() === "index") parts.pop();
+    }
     return parts;
   }
   function shouldAppendIndexPath(pathname) {
@@ -248,11 +274,139 @@
       a.setAttribute("href", rel);
     });
   }
+
+  const EMAILJS_PUBLIC_KEY = "rZgnsZHk3VI-0BApV";
+  const EMAILJS_SERVICE_ID = "service_zz8ccem";
+  const EMAILJS_TEMPLATE_BECOME_MEMBER = "template_7dd9wxb";
+  const EMAILJS_TEMPLATE_CONTACT = "template_jgmuf4b";
+  let emailjsInitialized = false;
+
+  function initEmailJS() {
+    if (emailjsInitialized) return true;
+    const emailjs = window.emailjs;
+    if (!emailjs) return false;
+    try {
+      emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+      emailjsInitialized = true;
+      return true;
+    } catch (e) {
+      try {
+        emailjs.init(EMAILJS_PUBLIC_KEY);
+        emailjsInitialized = true;
+        return true;
+      } catch (e2) {
+        console.warn("[emailjs] init failed", e, e2);
+        return false;
+      }
+    }
+  }
+
+  function findFormByFieldNames(requiredNames) {
+    const forms = qsa("form");
+    return (
+      forms.find((form) => requiredNames.every((name) => !!form.querySelector(`[name="${name}"]`))) ||
+      null
+    );
+  }
+
+  function getOrCreateFormStatusEl(form) {
+    const existing = form.querySelector('[data-ic-email-status="true"]');
+    if (existing) return existing;
+
+    const el = document.createElement("div");
+    el.setAttribute("data-ic-email-status", "true");
+    el.setAttribute("role", "status");
+    el.setAttribute("aria-live", "polite");
+    el.style.marginTop = "12px";
+    el.style.fontSize = "0.95rem";
+    el.style.lineHeight = "1.35";
+    el.style.display = "none";
+
+    const submitBtn = form.querySelector('button[type="submit"], input[type="submit"]');
+    if (submitBtn && submitBtn.parentElement) submitBtn.parentElement.appendChild(el);
+    else form.appendChild(el);
+
+    return el;
+  }
+
+  function setFormStatus(form, kind, message) {
+    const el = getOrCreateFormStatusEl(form);
+    if (!message) {
+      el.textContent = "";
+      el.style.display = "none";
+      return;
+    }
+    el.textContent = message;
+    el.style.display = "block";
+    el.style.color = kind === "success" ? "#86efac" : kind === "info" ? "#e4e4e7" : "#fca5a5";
+  }
+
+  async function sendEmailJSForm({ form, templateId }) {
+    const emailjs = window.emailjs;
+    if (!emailjs) {
+      setFormStatus(form, "error", "Email service failed to load. Please try again in a moment.");
+      return { ok: false };
+    }
+    if (!initEmailJS()) {
+      setFormStatus(form, "error", "Email service failed to initialize. Please try again in a moment.");
+      return { ok: false };
+    }
+
+    const submitBtn = form.querySelector('button[type="submit"], input[type="submit"]');
+    const prevDisabled = !!submitBtn?.disabled;
+    const prevText = submitBtn && "textContent" in submitBtn ? submitBtn.textContent : null;
+
+    try {
+      setFormStatus(form, "info", "");
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        if (prevText != null) submitBtn.textContent = "Sending…";
+      }
+
+      await emailjs.sendForm(EMAILJS_SERVICE_ID, templateId, form);
+      setFormStatus(form, "success", "Thanks :) we received your submission.");
+      form.reset();
+      return { ok: true };
+    } catch (e) {
+      console.warn("[emailjs] send failed", e);
+      setFormStatus(form, "error", "Sorry :( something went wrong. Please try again.");
+      return { ok: false, error: e };
+    } finally {
+      if (submitBtn) {
+        submitBtn.disabled = prevDisabled;
+        if (prevText != null) submitBtn.textContent = prevText;
+      }
+    }
+  }
+
+  function bindEmailForms() {
+    const becomeForm = findFormByFieldNames(["full_name", "reply_to", "job_title", "phone"]);
+    if (becomeForm && becomeForm.dataset.icEmailBound !== "true") {
+      becomeForm.dataset.icEmailBound = "true";
+      becomeForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        setFormStatus(becomeForm, "info", "");
+        void sendEmailJSForm({ form: becomeForm, templateId: EMAILJS_TEMPLATE_BECOME_MEMBER });
+      });
+    }
+
+    const contactForm = findFormByFieldNames(["first_name", "last_name", "reply_to", "message"]);
+    if (contactForm && contactForm.dataset.icEmailBound !== "true") {
+      contactForm.dataset.icEmailBound = "true";
+      contactForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        setFormStatus(contactForm, "info", "");
+        void sendEmailJSForm({ form: contactForm, templateId: EMAILJS_TEMPLATE_CONTACT });
+      });
+    }
+  }
+
   function init() {
     initInternalLinkIndexSuffix();
     initDesktopDropdowns();
     initMobileMenu();
     initDirectoryFilters();
+    bindEmailForms();
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
   else init();
