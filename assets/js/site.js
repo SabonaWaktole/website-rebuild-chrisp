@@ -215,64 +215,68 @@
     }
     update();
   }
-  function dirnamePathParts(pathname) {
-    const parts = pathname.split("/").filter(Boolean);
-    if (parts.length) {
-      const last = parts[parts.length - 1];
-      if (last.includes(".")) parts.pop();
-    }
-    if (parts.length) {
-      const last = parts[parts.length - 1];
-      if (last.toLowerCase() === "index") parts.pop();
-    }
-    return parts;
-  }
-  function shouldAppendIndexPath(pathname) {
+
+  /** Ensure internal page URLs use index.html (never bare /index). */
+  function pathnameToIndexHtml(pathname) {
+    if (!pathname || pathname === "/") return "/index.html";
     const trimmed = pathname.replace(/\/$/, "") || "/";
-    if (trimmed === "/" || trimmed === "") return true;
-    const segments = trimmed.split("/").filter(Boolean);
-    const last = segments[segments.length - 1];
-    if (last === "index") return false;
-    if (last.endsWith(".html")) return false;
-    if (last.includes(".") && !last.endsWith(".html")) return false;
-    const prefix = `/${segments.join("/")}`;
-    if (prefix.includes("/assets/") || prefix.includes("/images/")) return false;
+    if (trimmed === "/index") return "/index.html";
+    if (trimmed.endsWith("/index") && !trimmed.endsWith("/index.html")) {
+      return `${trimmed}.html`;
+    }
+    return pathname;
+  }
+  function isInternalPagePath(pathname) {
+    if (pathname.includes("/assets/") || pathname.includes("/images/")) return false;
+    const last = pathname.split("/").filter(Boolean).pop() || "";
+    if (/\.(css|js|png|jpe?g|gif|webp|svg|avif|ico)$/i.test(last)) return false;
     return true;
   }
-  function pathWithIndexSuffix(pathname) {
-    const base = pathname.replace(/\/$/, "") || "/";
-    if (base === "/" || base === "") return "/index";
-    return `${base}/index`;
+  function normalizeInternalAnchorHref(raw) {
+    if (!raw || raw.startsWith("javascript:")) return raw;
+    if (raw.startsWith("mailto:") || raw.startsWith("tel:")) return raw;
+    if (raw.startsWith("#")) return raw;
+    let url;
+    try {
+      url = new URL(raw, window.location.origin);
+    } catch {
+      return raw;
+    }
+    if (url.origin !== window.location.origin) return raw;
+    if (!isInternalPagePath(url.pathname)) return raw;
+    const fixedPath = pathnameToIndexHtml(url.pathname);
+    if (fixedPath === url.pathname) return raw;
+    url.pathname = fixedPath;
+    if (raw.startsWith("/")) return url.pathname + url.search + url.hash;
+    return url.pathname + url.search + url.hash;
   }
-  function relativePathBetween(fromPathname, toPathname) {
-    const fromParts = dirnamePathParts(fromPathname);
-    const toParts = toPathname.split("/").filter(Boolean);
-    let i = 0;
-    while (i < fromParts.length && i < toParts.length && fromParts[i] === toParts[i]) i++;
-    const ups = fromParts.length - i;
-    const out = [...Array(ups).fill(".."), ...toParts.slice(i)];
-    if (!out.length) return ".";
-    return out.join("/");
+  function redirectBareIndexInAddressBar() {
+    const path = window.location.pathname || "";
+    if (!path.endsWith("/index") || path.endsWith("/index.html")) return false;
+    const next = pathnameToIndexHtml(path) + window.location.search + window.location.hash;
+    window.location.replace(next);
+    return true;
   }
-  function initInternalLinkIndexSuffix() {
-    const here = new URL(window.location.href);
+  function initIndexHtmlLinks() {
+    if (redirectBareIndexInAddressBar()) return;
     qsa("a[href]").forEach((a) => {
       const raw = a.getAttribute("href");
-      if (!raw || raw.startsWith("javascript:")) return;
-      if (raw.startsWith("mailto:") || raw.startsWith("tel:")) return;
-      let resolved;
-      try {
-        resolved = new URL(raw, document.baseURI);
-      } catch {
-        return;
-      }
-      if (resolved.origin !== here.origin) return;
-      if (!shouldAppendIndexPath(resolved.pathname)) return;
-      const nextPath = pathWithIndexSuffix(resolved.pathname);
-      const target = new URL(nextPath + resolved.search + resolved.hash, resolved.origin);
-      const rel = relativePathBetween(here.pathname, target.pathname) + target.search + target.hash;
-      a.setAttribute("href", rel);
+      const fixed = normalizeInternalAnchorHref(raw);
+      if (fixed && fixed !== raw) a.setAttribute("href", fixed);
     });
+    document.addEventListener(
+      "click",
+      (e) => {
+        const a = e.target.closest("a[href]");
+        if (!a) return;
+        const raw = a.getAttribute("href");
+        const fixed = normalizeInternalAnchorHref(raw);
+        if (!fixed || fixed === raw) return;
+        e.preventDefault();
+        window.location.href = fixed;
+      },
+      true
+    );
   }
 
   const EMAILJS_PUBLIC_KEY = "rZgnsZHk3VI-0BApV";
@@ -402,7 +406,7 @@
   }
 
   function init() {
-    initInternalLinkIndexSuffix();
+    initIndexHtmlLinks();
     initDesktopDropdowns();
     initMobileMenu();
     initDirectoryFilters();
