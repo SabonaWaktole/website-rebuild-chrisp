@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Rewrite internal <a href> targets to .../index for static hosts (e.g. Crazy Domains)."""
+"""Rewrite internal <a href> targets to .../index.html for static hosts (e.g. Crazy Domains).
+
+Never use the old /index suffix on this repo — hosts require index.html.
+Prefer scripts/to_root_index_html_links.py for root-absolute paths.
+"""
 from __future__ import annotations
 
 import re
@@ -39,6 +43,8 @@ def should_rewrite(href: str) -> bool:
     path = href.split("#", 1)[0].split("?", 1)[0]
     if not path:
         return False
+    if path.endswith("/index.html") or path.endswith("/index.html/"):
+        return False
     if path.endswith("/index") or path.endswith("/index/"):
         return False
     if path.endswith(".html"):
@@ -61,13 +67,15 @@ def rewrite_href(href: str) -> str:
         q_part = "?" + q
     path = rest
     if path in (".", "./"):
-        return "./index" + q_part + hash_part
+        return "./index.html" + q_part + hash_part
     if path in ("..", "../"):
-        return "../index" + q_part + hash_part
+        return "../index.html" + q_part + hash_part
     path = path.rstrip("/")
-    if path.endswith("/index"):
+    if path.endswith("/index.html"):
         return href
-    return path + "/index" + q_part + hash_part
+    if path.endswith("/index"):
+        return path + ".html" + q_part + hash_part
+    return path + "/index.html" + q_part + hash_part
 
 
 A_HREF_RE = re.compile(r'(<a\b[^>]*\bhref=")([^"]+)(")', re.IGNORECASE)
