@@ -1,0 +1,292 @@
+[
+  {
+    "slug": "brett-carter",
+    "name": "Brett Carter",
+    "title": "Owner",
+    "company": "Brett Carter Events",
+    "gender": "Male",
+    "industries": [
+      "Education & Nonprofit",
+      "Professional Services"
+    ],
+    "tags": [
+      "Strategic Stakeholder Management",
+      "Large-Scale Event Production",
+      "Career & Education Advocacy",
+      "Community & Youth Engagement",
+      "End-to-End Project Coordination"
+    ],
+    "shortBio": "With over 15 years of experience, Brett Carter is a premier event management specialist in New South Wales, connecting thousands of career seekers with industry leaders through large-scale career and education expos.",
+    "featured": false
+  },
+  {
+    "slug": "lisa-di-bella",
+    "name": "Lisa Di Bella",
+    "title": "Owner",
+    "company": "Di Bella Cleaning Services",
+    "gender": "Female",
+    "industries": [
+      "Professional Services",
+      "Property"
+    ],
+    "tags": [
+      "Workforce Management & Staff Coordination",
+      "Quality Assurance & Cleaning Standards",
+      "Client Relationship Management",
+      "Operational Efficiency & Scheduling",
+      "Staff Training & Performance Development"
+    ],
+    "shortBio": "Owner and Manager of Di Bella Cleaning Services, overseeing staff, scheduling, client relationships, quality assurance, and daily operations while ensuring high standards, team performance, and exceptional service delivery.",
+    "featured": false
+  },
+  {
+    "slug": "rachel-szymkarczuk",
+    "name": "Rachel Szymkarczuk",
+    "title": "Founder",
+    "company": "HitLocal Hub",
+    "gender": "Female",
+    "industries": [
+      "Technology & Digital",
+      "Professional Services"
+    ],
+    "tags": [
+      "digital marketing",
+      "platform development",
+      "local business",
+      "community engagement",
+      "lead generation",
+      "marketplace",
+      "business strategy",
+      "growth strategy"
+    ],
+    "shortBio": "Rachel Szymkarczuk is the founder of HitLocal Hub, a digital platform focused on helping local businesses increase visibility, generate leads, and strengthen community engagement. She is passionate about creating sustainable solutions that empower businesses beyond traditional social media channels.",
+    "featured": false
+  },
+  {
+    "slug": "luis-gonzalez",
+    "name": "Luis Gonzalez",
+    "title": "Founder & CEO",
+    "company": "Comstel ICT",
+    "gender": "Male",
+    "industries": [
+      "Technology & Digital",
+      "Professional Services"
+    ],
+    "tags": [
+      "ict",
+      "cybersecurity",
+      "telecommunications",
+      "digital transformation",
+      "managed services",
+      "cloud solutions",
+      "business strategy",
+      "entrepreneurship"
+    ],
+    "shortBio": "Luis Gonzalez is the founder and CEO of Comstel ICT, delivering simple, reliable, and future-ready technology solutions for Australian businesses.",
+    "featured": false
+  },
+  {
+    "slug": "camelia-vasile",
+    "name": "Camelia Vasile",
+    "title": "Founder & Marketing Strategist",
+    "company": "Zoom Direct Media",
+    "gender": "Female",
+    "industries": [
+      "Technology & Digital",
+      "Professional Services"
+    ],
+    "tags": [
+      "marketing strategy",
+      "conversion optimisation",
+      "lead generation",
+      "funnels",
+      "marketing automation",
+      "revenue growth",
+      "digital strategy"
+    ],
+    "shortBio": "Founder of Zoom Direct Media, Camelia helps businesses uncover hidden revenue and turn fragmented marketing into predictable client acquisition systems.",
+    "featured": false
+  },
+  {
+    "slug": "sara-ang",
+    "name": "Sara Ang",
+    "title": "Founder & Creative Director",
+    "company": "THE MAY BRANDWORKS",
+    "gender": "Female",
+    "industries": [],
+    "tags": [
+      "brand strategy",
+      "tourism marketing",
+      "storytelling",
+      "customer experience",
+      "business growth",
+      "creative direction",
+      "personal branding",
+      "destination development"
+    ],
+    "shortBio": "Sara Ang is a brand strategist and creative director helping founders and tourism operators clarify their voice and grow meaningful, high-converting brands.",
+    "featured": false
+  },
+  {
+    "slug": "eden-connell",
+    "name": "Eden Connell",
+    "title": "Owner and Lead Photographer / Videographer",
+    "company": "Zoom In With Eden Photography",
+    "gender": "Male",
+    "industries": [],
+    "tags": [
+      "photography",
+      "videography",
+      "event photography",
+      "corporate branding",
+      "drone media",
+      "commercial photography",
+      "business storytelling",
+      "content creation"
+    ],
+    "shortBio": "I help businesses look their best through high quality photo and video that builds trust, stands out, and helps them win more work.",
+    "featured": false
+  },
+  {
+    "slug": "linda-dunkin",
+    "name": "Linda Dunkin",
+    "title": "Owner & Fractional Marketing Manager",
+    "company": "Market My Brand",
+    "gender": "female",
+    "industries": [],
+    "tags": [
+      "marketing strategy",
+      "fractional cmo",
+      "brand leadership",
+      "outsourced marketing",
+      "project management",
+      "business growth",
+      "consulting",
+      "entrepreneur support"
+    ],
+    "shortBio": "Strategic marketing leader with 20+ years of experience helping businesses grow through tailored marketing strategies and hands-on leadership.",
+    "featured": false
+  },
+  {
+    "slug": "kirri-garvey",
+    "name": "Kirri Garvey",
+    "title": "Owner & Professional Photographer",
+    "company": "Captured by Kirri",
+    "gender": "Female",
+    "industries": [],
+    "tags": [
+      "photography",
+      "personal branding",
+      "family photography",
+      "women over 40",
+      "confidence building",
+      "posing techniques",
+      "visual storytelling",
+      "client experience"
+    ],
+    "shortBio": "I help women over 40 feel confident being the face of their business through personal branding photography while capturing meaningful family moments that last a lifetime.",
+    "featured": false
+  },
+  {
+    "slug": "dinesh-singh",
+    "name": "Dinesh Singh",
+    "title": "Vision Strategist / Founder",
+    "company": "Celux",
+    "gender": "Male",
+    "industries": [],
+    "tags": [
+      "automation",
+      "artificial intelligence",
+      "workflow design",
+      "business strategy",
+      "process optimisation",
+      "systems integration",
+      "product leadership",
+      "growth strategy"
+    ],
+    "shortBio": "I help businesses transform manual workflows into automated, AI-powered systems that boost productivity and enable scalable growth.",
+    "featured": false
+  },
+  {
+    "slug": "genene-wilson",
+    "name": "Genene Wilson",
+    "title": "Revenue Architect & Sales Performance Strategist",
+    "company": "Finesse Advisers Pty Ltd",
+    "gender": "Female",
+    "industries": [],
+    "tags": [
+      "revenue architecture",
+      "sales psychology",
+      "business strategy",
+      "conversion optimisation",
+      "leadership development",
+      "commercial strategy",
+      "entrepreneurial growth",
+      "business advisory"
+    ],
+    "shortBio": "Revenue Architect and Founder of the PROSPER Method helping business owners increase conversions, strengthen leadership identity, and build sustainable revenue through strategic positioning and behavioural sales psychology.",
+    "featured": true
+  },
+  {
+    "slug": "matt-riley",
+    "name": "Matt Riley",
+    "title": "Director of Franchise Development",
+    "company": "Wash Drones",
+    "gender": "Male",
+    "industries": [],
+    "tags": [
+      "drone technology",
+      "aerial robotics",
+      "facility maintenance",
+      "infrastructure innovation",
+      "franchise development",
+      "aviation safety",
+      "preventative maintenance",
+      "industrial drones"
+    ],
+    "shortBio": "Matt Riley is the Director of Franchise Development at Wash Drones, leading the expansion of advanced aerial robotics for safer, faster infrastructure maintenance across large-scale facilities.",
+    "featured": false
+  },
+  {
+    "slug": "daller-badaloff",
+    "name": "Daller Badaloff",
+    "title": "Senior Technology Leader",
+    "company": "Vertex Advisory Group",
+    "gender": "Male",
+    "industries": [
+      "Technology & Digital",
+      "Professional Services"
+    ],
+    "tags": [
+      "technology leadership",
+      "digital transformation",
+      "technology consulting",
+      "enterprise delivery",
+      "strategy execution",
+      "program leadership",
+      "technology governance"
+    ],
+    "shortBio": "Senior technology and transformation leader helping organisations align strategy, delivery and execution to achieve measurable business outcomes. Experienced across financial services, consulting and complex enterprise environments.",
+    "featured": true
+  },
+  {
+    "slug": "chris-pennisi",
+    "name": "Chris Pennisi",
+    "title": "Founder & Business Strategist",
+    "company": "Boss Capital",
+    "gender": "Male",
+    "industries": [],
+    "tags": [
+      "sales",
+      "marketing",
+      "business strategy",
+      "coaching",
+      "leadership",
+      "technology",
+      "enterprise growth",
+      "consulting"
+    ],
+    "shortBio": "Chris Pennisi is an accomplished business strategist with over 20 years of experience across sales, marketing, technology, and enterprise growth. He helps businesses move beyond obstacles and unlock sustainable, strategic expansion.",
+    "featured": true
+  }
+]
